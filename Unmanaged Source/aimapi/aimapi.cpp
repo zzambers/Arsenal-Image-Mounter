@@ -233,6 +233,12 @@ ImScsiOpenScsiAdapter(OUT LPBYTE PortNumber)
             continue;
         }
 
+        if (!ImScsiCheckDriverVersion(handle)) {
+            last_error = GetLastError();
+            NtClose(handle);
+            continue;
+        }
+
         SRB_IMSCSI_CHECK check;
         ImScsiInitializeSrbIoBlock(&check.SrbIoControl, sizeof(check),
             SMP_IMSCSI_CHECK, 0);
