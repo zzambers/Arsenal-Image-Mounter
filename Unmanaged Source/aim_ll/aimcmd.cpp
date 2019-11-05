@@ -18,18 +18,18 @@
 #include <devioctl.h>
 #include <ntddscsi.h>
 #include <ntdddisk.h>
-#include <WinIoCtl.h>
+//#include <winioctl.h>
 
-#include "..\phdskmnt\inc\common.h"
-#include "..\aimapi\aimapi.h"
+#include "../phdskmnt/inc/common.h"
+#include "../aimapi/aimapi.h"
 
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "..\aimapi\winstrct.hpp"
+#include "../aimapi/winstrct.hpp"
 
-#include "..\phdskmnt\inc\ntumapi.h"
-#include "..\phdskmnt\inc\phdskmntver.h"
+#include "../phdskmnt/inc/ntumapi.h"
+#include "../phdskmnt/inc/phdskmntver.h"
 
 #include "aimcmd.h"
 
@@ -39,6 +39,32 @@
 #pragma comment(lib, "shell32.lib")
 #pragma comment(lib, "imdisk.lib")
 #pragma comment(lib, "ntdll.lib")
+
+typedef struct _SET_DISK_ATTRIBUTES {
+  DWORD     Version;
+  BOOLEAN   Persist;
+  BYTE      Reserved1[3];
+  DWORDLONG Attributes;
+  DWORDLONG AttributesMask;
+  DWORD     Reserved2[4];
+} SET_DISK_ATTRIBUTES, *PSET_DISK_ATTRIBUTES;
+
+#define DISK_ATTRIBUTE_OFFLINE 0x0000000000000001
+#define DISK_ATTRIBUTE_READ_ONLY 0x0000000000000002
+#define IOCTL_DISK_SET_DISK_ATTRIBUTES 0x0007C0F4
+
+#define CTL_CODE( DeviceType, Function, Method, Access ) (                 \
+    (DWORD)((DeviceType) << 16) | ((Access) << 14) | ((Function) << 2) | (Method) \
+)
+
+#define FILE_DEVICE_FILE_SYSTEM         0x00000009
+#define METHOD_NEITHER                  3
+#define FILE_ANY_ACCESS                 0
+
+#define IOCTL_VOLUME_BASE ((DWORD) 'V')
+
+#define FSCTL_ALLOW_EXTENDED_DASD_IO    CTL_CODE(FILE_DEVICE_FILE_SYSTEM, 32, METHOD_NEITHER,  FILE_ANY_ACCESS)
+#define IOCTL_VOLUME_ONLINE                  CTL_CODE(IOCTL_VOLUME_BASE,2,METHOD_BUFFERED,FILE_READ_ACCESS | FILE_WRITE_ACCESS)
 
 enum
 {
@@ -64,10 +90,10 @@ enum
 #define DbgOemPrintF(x)
 
 /// Macros for "human readable" file sizes.
-#define _1KB  (1ui64<<10)
-#define _1MB  (1ui64<<20)
-#define _1GB  (1ui64<<30)
-#define _1TB  (1ui64<<40)
+#define _1KB  (1ull<<10)
+#define _1MB  (1ull<<20)
+#define _1GB  (1ull<<30)
+#define _1TB  (1ull<<40)
 
 #define _B(n)  ((double)(n))
 #define _KB(n) ((double)(n)/_1KB)
@@ -1472,7 +1498,7 @@ LPWSTR MountPoint)
             IMSCSI_DEVICE_TYPE_FD ? ", Floppy" : ", HDD",
             config->Flags & IMSCSI_IMAGE_MODIFIED ? ", Modified" : "");
 
-        flushall();
+        _flushall();
 
         // Now enumerate disk volumes
 
@@ -2114,8 +2140,10 @@ wmain(int argc, LPWSTR argv[])
                 {
                     WCHAR suffix = 0;
 
-                    (void)swscanf(argv[1], L"%I64i%c",
-                        &disk_geometry.QuadPart, &suffix);
+                    /*(void)swscanf(argv[1], L"%lli%c"  L"%I64i%c"  ,*/
+                        /*&disk_geometry.QuadPart, &suffix);*/
+                    disk_geometry.QuadPart = 8;
+                    suffix = L'G';
 
                     switch (suffix)
                     {
@@ -2217,7 +2245,7 @@ wmain(int argc, LPWSTR argv[])
                 {
                     WCHAR suffix = 0;
 
-                    (void)swscanf(argv[1], L"%I64u%c",
+                    (void)swscanf(argv[1], L"%llu%c",
                         &image_offset.QuadPart, &suffix);
 
                     switch (suffix)
@@ -2428,7 +2456,7 @@ ExceptionFilter(LPEXCEPTION_POINTERS ExceptionInfo)
             (LPVOID)ExceptionInfo->ExceptionRecord->ExceptionInformation[i]);
     }
 
-    flushall();
+    _flushall();
     ExitProcess((UINT)-1);
 }
 

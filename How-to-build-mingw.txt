@@ -1,0 +1,13 @@
+On fedora:
+- install mingw64-gcc-c++ mingw64-gcc
+- download sources of imdisk an unpack them next to this repo,
+  (url: http://www.ltr-data.se/files/imdisk_source.7z), unpacked dir needs to be named imdisk
+- unpack aimapi.zip (in API directory) to aimapi dir,
+  in aimapi/x64 remove everything except for imdisk.cpl,
+  create symlink named imdisk.dll pointing to imdisk.cpl
+- build aimapi.dll by running make in Unmanaged Source/aimapi dir
+- resulting aimapi.dll requires dlls from /usr/x86_64-w64-mingw32/sys-root/mingw/bin/
+  to be placed to it's directory
+- Use this aimapi.dll with aim_ll.exe, imdisk.cpl
+  (from "Command line applications/aim_II.zip" , x64 ),
+  replacing original aimapi.dll

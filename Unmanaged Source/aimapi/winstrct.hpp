@@ -290,9 +290,11 @@ public:
 
     T* operator =(T *pBlk)
     {
-        Free();
+        Free2();
         return ptr = pBlk;
     }
+
+    virtual void Free2() = 0;
 
     T* Abandon()
     {
@@ -316,6 +318,10 @@ public:
     WEnvironmentStrings()
         : WMemHolder<TCHAR>(GetEnvironmentStrings())
     {
+    }
+
+    void Free2() {
+        Free();
     }
 
     BOOL Free()
@@ -342,7 +348,7 @@ public:
     T* operator =(T *pBlk)
     {
         Free();
-        return ptr = pBlk;
+        return WMemHolder<T>::ptr = pBlk;
     }
 
     DWORD_PTR Count() const
@@ -352,10 +358,10 @@ public:
 
     DWORD_PTR GetSize() const
     {
-        if (ptr == NULL)
+        if (WMemHolder<T>::ptr == NULL)
             return 0;
         else
-            return LocalSize(ptr);
+            return LocalSize(WMemHolder<T>::ptr);
     }
 
     /* WMem::ReAlloc()
@@ -365,19 +371,23 @@ public:
     */
     T* ReAlloc(DWORD dwAllocSize)
     {
-        T *newblock = (T*)LocalReAlloc(ptr, dwAllocSize, LMEM_ZEROINIT);
+        T *newblock = (T*)LocalReAlloc(WMemHolder<T>::ptr, dwAllocSize, LMEM_ZEROINIT);
         if (newblock != NULL)
-            return ptr = newblock;
+            return WMemHolder<T>::ptr = newblock;
         else
             return NULL;
     }
 
+    void Free2() {
+        Free();
+    }
+
     T* Free()
     {
-        if (ptr == NULL)
+        if (WMemHolder<T>::ptr == NULL)
             return NULL;
         else
-            return ptr = (T*)LocalFree(ptr);
+            return WMemHolder<T>::ptr = (T*)LocalFree(WMemHolder<T>::ptr);
     }
 
     WMem()
@@ -407,7 +417,7 @@ public:
     T* operator =(T *pBlk)
     {
         Free();
-        return ptr = pBlk;
+        return WMemHolder<T>::ptr = pBlk;
     }
 
     size_t Count() const
@@ -417,10 +427,10 @@ public:
 
     size_t GetSize() const
     {
-        if (ptr == NULL)
+        if (WMemHolder<T>::ptr == NULL)
             return 0;
         else
-            return _msize(ptr);
+            return _msize(WMemHolder<T>::ptr);
     }
 
     /* WHeapMem::ReAlloc()
@@ -435,6 +445,10 @@ public:
             return ptr = newblock;
         else
             return NULL;
+    }
+
+    void Free2() {
+        Free();
     }
 
     void Free()
@@ -469,7 +483,7 @@ public:
     T* operator =(T *pBlk)
     {
         Free();
-        return ptr = pBlk;
+        return WMemHolder<T>::ptr = pBlk;
     }
 
     SIZE_T Count() const
@@ -479,10 +493,10 @@ public:
 
     SIZE_T GetSize(DWORD dwFlags = 0) const
     {
-        if (ptr == NULL)
+        if (WMemHolder<T>::ptr == NULL)
             return 0;
         else
-            return HeapSize(GetProcessHeap(), dwFlags, ptr);
+            return HeapSize(GetProcessHeap(), dwFlags, WMemHolder<T>::ptr);
     }
 
     /* WHeapMem::ReAlloc()
@@ -492,29 +506,33 @@ public:
     */
     T* ReAlloc(SIZE_T AllocSize, DWORD dwFlags = 0)
     {
-        if (ptr == NULL)
+        if (WMemHolder<T>::ptr == NULL)
         {
-            return ptr =
+            return WMemHolder<T>::ptr =
                 (T*)HeapAlloc(GetProcessHeap(), dwFlags, AllocSize);
         }
 
-        T *newblock = HeapReAlloc(GetProcessHeap(), dwFlags, ptr, AllocSize);
+        T *newblock = HeapReAlloc(GetProcessHeap(), dwFlags, WMemHolder<T>::ptr, AllocSize);
 
         if (newblock != NULL)
-            return ptr = newblock;
+            return WMemHolder<T>::ptr = newblock;
         else
             return NULL;
     }
 
+    void Free2() {
+        Free();
+    }
+
     T *Free(DWORD dwFlags = 0)
     {
-        if ((this == NULL) || (ptr == NULL))
+        if ((this == NULL) || (WMemHolder<T>::ptr == NULL))
             return NULL;
-        else if (HeapFree(GetProcessHeap(), dwFlags, ptr))
-            return ptr = NULL;
+        else if (HeapFree(GetProcessHeap(), dwFlags, WMemHolder<T>::ptr))
+            return WMemHolder<T>::ptr = NULL;
         else
 #pragma warning(suppress: 6001)
-            return ptr;
+            return WMemHolder<T>::ptr;
     }
 
     WHeapMem()

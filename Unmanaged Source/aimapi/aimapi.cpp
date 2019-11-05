@@ -16,8 +16,8 @@
 
 #include "stdafx.h"
 
-#include "..\phdskmnt\inc\ntumapi.h"
-#include "..\phdskmnt\inc\phdskmntver.h"
+#include "../phdskmnt/inc/ntumapi.h"
+#include "../phdskmnt/inc/phdskmntver.h"
 
 #include <imdisk.h>
 #include <imdproxy.h>
@@ -32,6 +32,24 @@
 #pragma comment(lib, "advapi32.lib")
 #pragma comment(lib, "imdisk.lib")
 #pragma comment(lib, "ntdll.lib")
+
+
+
+typedef struct _SET_DISK_ATTRIBUTES {
+  DWORD     Version;
+  BOOLEAN   Persist;
+  BYTE      Reserved1[3];
+  DWORDLONG Attributes;
+  DWORDLONG AttributesMask;
+  DWORD     Reserved2[4];
+} SET_DISK_ATTRIBUTES, *PSET_DISK_ATTRIBUTES;
+
+
+#define DISK_ATTRIBUTE_OFFLINE 0x0000000000000001
+#define DISK_ATTRIBUTE_READ_ONLY 0x0000000000000002
+#define IOCTL_DISK_SET_DISK_ATTRIBUTES 0x0007C0F4
+
+
 
 // Known file format offsets
 typedef struct _KNOWN_FORMAT

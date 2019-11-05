@@ -19,11 +19,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "..\aimapi\winstrct.hpp"
+#include "../aimapi/winstrct.hpp"
 
-#include "..\phdskmnt\inc\ntumapi.h"
-#include "..\phdskmnt\inc\common.h"
-#include "..\aimapi\aimapi.h"
+#include "../phdskmnt/inc/ntumapi.h"
+#include "../phdskmnt/inc/common.h"
+#include "../aimapi/aimapi.h"
 
 #include "aimcmd.h"
 

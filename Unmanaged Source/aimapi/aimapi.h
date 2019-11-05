@@ -13,6 +13,15 @@
 
 #ifndef AIMAPI_API
 
+#include <windows.h>
+#define __in
+#define __out
+#define __inout
+#define __in_opt
+#define __deref
+#define min(x,y) (((x) < (y)) ? (x) : (y))
+#define max(x,y) (((x) > (y)) ? (x) : (y))
+
 #ifdef AIMAPI_EXPORTS
 #define AIMAPI_API __declspec(dllexport)
 #else

@@ -16,12 +16,12 @@
 #include "stdafx.h"
 
 #include <devguid.h>
-#include <SetupAPI.h>
+#include <setupapi.h>
 #include <cfgmgr32.h>
 #include <newdev.h>
 
-#include "..\phdskmnt\inc\ntumapi.h"
-#include "..\phdskmnt\inc\phdskmntver.h"
+#include "../phdskmnt/inc/ntumapi.h"
+#include "../phdskmnt/inc/phdskmntver.h"
 
 #include <imdisk.h>
 #include <imdproxy.h>
